@@ -2,8 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from mpi4py import MPI
 from dbcon import connection
-from show import get_pokemon_names, get_pokemon_name_by_numbers
-from binary_search import binary_search
+from show import get_pokemon_names, get_pokemon_name_by_numbers, binary_search
 
 def get_pokemon_data():
     client, db = connection()
@@ -82,30 +81,27 @@ class PokemonViewer:
         self.index = 0
         self.show_pokemon()
 
+    def sort_by_name2(self):
+        self.pokemons = get_pokemon_names()
+        self.index = 0
+        return self.pokemons
+
     def sort_by_number(self):
         self.pokemons = get_pokemon_name_by_numbers()
         self.index = 0
         self.show_pokemon()
 
     def search_pokemon(self):
+        pokemons = self.sort_by_name2()
+        pokemons = [(name.lower(), number) for name, number in pokemons]
         search_term = self.entry_search.get().lower()
-        result = binary_search(self.pokemons, search_term)
-        if result:
-            self.index = self.pokemons.index(result)
+        index = binary_search(pokemons, search_term, 0, len(pokemons))
+        if index != -1:
+            self.index = index
             self.show_pokemon()
         else:
             print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
 
-    """"
-    def search_pokemon(self):
-        search_term = self.entry_search.get().lower()
-        result = binary_search(self.pokemons, search_term)
-        if result:
-            self.index = self.pokemons.index(result)
-            self.show_pokemon()
-        else:
-            print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
-   """
     def run(self):
         self.window.mainloop()
 

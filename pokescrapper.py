@@ -44,7 +44,7 @@ def process_pokemon_info(pokemon_list_section):
                     }
                     result = pokemon_collection.insert_one(pokemon_data)
                     print("Pokemon insertado correctamente con ID:", result.inserted_id)
-                    print(f"Se insertó: {name}, Número: {pokedex_number}, Tipo(s): {', '.join(types)}")
+                    print(f"Se inserto: {name}, Numero: {pokedex_number}, Tipo(s): {', '.join(types)}")
                 else:
                     print(f"Fallo al descargar la imagen de: {name}")
 
@@ -79,5 +79,4 @@ if response.status_code == 200:
 else:
     print(f"Error al hacer la solicitud. Código de estado: {response.status_code}")
 
-# Cerrar la conexión a la base de datos
 client.close()

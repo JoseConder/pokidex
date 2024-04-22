@@ -2,6 +2,7 @@ from mpi4py import MPI
 from dbcon import connection
 from quicksort import parallel_quicksort
 
+
 def get_pokemon_names():
     client, db = connection()
     pokemon_collection = db['Pokemon']
@@ -52,15 +53,40 @@ def get_pokemon_name_by_numbers():
 
     return pokemons
 
+def binary_search(data, key, start_index, end_index):
+    low = start_index
+    high = end_index - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if data[mid][0] == key:
+            return mid  
+        elif data[mid][0] < key:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1  
+
+def show_pokemon(pokemons):
+    count = 0
+    for pokemon in pokemons:
+            name, number = pokemon
+            count += 1
+            try:
+                print(f"Nombre: {name}, Numero: {number}, Contador: {count}")
+            except UnicodeEncodeError:
+                print(f"Nombre: {name.encode('ascii', 'ignore').decode()}, Numero: {number}, Contador: {count}")
+            print(f"Total de Pokemon: {count}")
+
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    count = 0
 
     if rank == 0:
-        print("Ordenar por Alfabeto o por Numero?")
-        print("1. Alfabeto \n2. Numero")
-        choice = input("Ingrese su eleccion (1 o 2): ")
+        print("¿Que te gustaria hacer?")
+        print("1. Ordenar alfabeticamente")
+        print("2. Ordenar por numero de Pokedex")
+        print("3. Buscar un Pokemon por nombre")
+        choice = input("Ingrese su eleccion (1, 2 o 3): ")
     else:
         choice = None
 
@@ -68,18 +94,23 @@ if __name__ == "__main__":
 
     if choice == "1":
         pokemons = get_pokemon_names()
+        show_pokemon(pokemons)
     elif choice == "2":
         pokemons = get_pokemon_name_by_numbers()
-    elif choice == None:
-        print("Opcion Invalida")
-        exit()
+        show_pokemon(pokemons)
+    elif choice == "3":
+        if rank == 0:
+            pokemon_name = input("Ingresa el nombre del Pokemon que deseas buscar: ")
+        else:
+            pokemon_name = None
 
-    if rank == 0:
-        for pokemon in pokemons:
-            name, number = pokemon
-            count += 1
-            try:
-                print(f"Nombre: {name}, Numero: {number}, Cuenta: {count}")
-            except UnicodeEncodeError:
-                print(f"Nombre: {name.encode('ascii', 'ignore').decode()}, Numero: {number}, Cuenta: {count}")
-        print(f"Total de pokemons: {count}")
+        pokemon_name = comm.bcast(pokemon_name, root=0)
+        pokemons = get_pokemon_names()
+        index = binary_search(pokemons, pokemon_name, 0, len(pokemons))
+        if index != -1:
+            print("Pokemon encontrado:", pokemons[index][0])
+        else:
+            print("Pokemon no encontrado.")
+    elif choice is None:
+        print("Opción inválida")
+        exit()
