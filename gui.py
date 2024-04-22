@@ -42,17 +42,24 @@ class PokemonViewer:
         self.button_next.pack(side=tk.RIGHT)
 
         # Botones para seleccionar la lista a usar
-        self.button_sort_by_name = tk.Button(self.window, text="Sort by Name", command=self.sort_by_name)
+        self.button_sort_by_name = tk.Button(self.window, text="Ordenar por Nombre", command=self.sort_by_name)
         self.button_sort_by_name.pack(side=tk.LEFT)
 
-        self.button_sort_by_number = tk.Button(self.window, text="Sort by Number", command=self.sort_by_number)
+        self.button_sort_by_number = tk.Button(self.window, text="Ordenar por Número", command=self.sort_by_number)
         self.button_sort_by_number.pack(side=tk.RIGHT)
 
         self.entry_search = tk.Entry(self.window)
         self.entry_search.pack()
 
-        self.button_search = tk.Button(self.window, text="Buscar", command=self.search_pokemon)
+        self.button_search = tk.Button(self.window, text="Buscar por Nombre", command=self.search_pokemon)
         self.button_search.pack()
+        # Entry para buscar por número
+        self.entry_search_number = tk.Entry(self.window)
+        self.entry_search_number.pack()
+
+        # Botón para buscar por número
+        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon_by_number)
+        self.button_search_number.pack()
 
         self.show_pokemon()
 
@@ -87,7 +94,13 @@ class PokemonViewer:
         self.index = 0
         self.show_pokemon()
 
+    def sort_by_name2(self):
+        self.pokemons = get_pokemon_names()
+        self.index=0
+        return self.pokemons
+    
     def search_pokemon(self):
+        pokemons=self.sort_by_name2()
         search_term = self.entry_search.get().lower()
         result = binary_search(self.pokemons, search_term)
         if result:
@@ -96,16 +109,50 @@ class PokemonViewer:
         else:
             print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
 
-    """"
-    def search_pokemon(self):
-        search_term = self.entry_search.get().lower()
-        result = binary_search(self.pokemons, search_term)
-        if result:
-            self.index = self.pokemons.index(result)
-            self.show_pokemon()
-        else:
-            print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
-   """
+    def sort_by_number2(self):
+        self.pokemons = get_pokemon_name_by_numbers()
+        self.index=0
+        return self.pokemons
+    
+    def search_pokemon_by_number(self):
+        pokemons=self.sort_by_number2()
+        try:
+            number_str = self.entry_search_number.get().zfill(4)  # Asegura que el número tenga 4 dígitos
+            number = int(number_str)
+            result = self.binary_search_by_number(number)
+            if result:
+                self.index = self.pokemons.index(result)
+                self.show_pokemon()
+            else:
+                print(f"No se encontró ningún Pokémon con el número '{number_str}'")
+        except ValueError:
+            print("Por favor, introduce un número válido.")
+
+    def binary_search_by_number(self, target_number):
+        target_str = str(target_number).zfill(4) 
+        
+        low = 0
+        high = len(self.pokemons) - 1
+
+        while low <= high:
+            mid = (low + high) // 2
+            pokemon_number_str = str(self.pokemons[mid][1]).zfill(4)  
+            
+            # Eliminar el símbolo '#' del número del Pokémon
+            pokemon_number_str = pokemon_number_str.replace('#', '')
+            
+            #print(f"Comparando {pokemon_number_str} con {target_str}")
+            
+            if pokemon_number_str == target_str:
+                return self.pokemons[mid]
+            elif pokemon_number_str < target_str:
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        return None
+
+    
     def run(self):
         self.window.mainloop()
 
@@ -116,5 +163,4 @@ if comm.Get_rank() == 0:
     viewer = PokemonViewer(pokemons)
     viewer.run()
 else:
-    # Código para los procesos MPI adicionales, si es necesario
     pass
