@@ -57,7 +57,7 @@ class PokemonViewer:
         self.entry_search_number.pack()
 
         # Botón para buscar por número
-        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon_by_number)
+        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon)
         self.button_search_number.pack()
 
         self.show_pokemon()
@@ -113,6 +113,20 @@ class PokemonViewer:
             self.show_pokemon()
         else:
             print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
+    
+    def search_pokemon_by_number(self):
+        pokemons=self.sort_by_number2()
+        try:
+            number_str = self.entry_search_number.get().zfill(4)  # Asegura que el número tenga 4 dígitos
+            number = int(number_str)
+            result = self.binary_search_by_number(number)
+            if result:
+                self.index = self.pokemons.index(result)
+                self.show_pokemon()
+            else:
+                print(f"No se encontró ningún Pokémon con el número '{number_str}'")
+        except ValueError:
+            print("Por favor, introduce un número válido.")
 
     def run(self):
         self.window.mainloop()
