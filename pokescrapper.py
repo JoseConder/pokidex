@@ -26,27 +26,27 @@ def process_pokemon_info(pokemon_list_section):
             pokedex_number = pokemon_card.find('small').text.strip()
             existing_pokemon = pokemon_collection.find_one({"Name": name})
 
-            if existing_pokemon:
-                print(f"Salteando: {name} ya existe en la base de datos.")
-            else:
-                type_elements = pokemon_card.find_all('a', class_='itype')
-                types = [type_element.text.strip() for type_element in type_elements]
-                img_url = pokemon_card.find('img')['src']
-                filename = f"./resources/pokemon/{name}.png"
+            type_elements = pokemon_card.find_all('a', class_='itype')
+            types = [type_element.text.strip() for type_element in type_elements]
+            img_url = pokemon_card.find('img')['src']
+            filename = f"./resources/pokemon/{name}.png"
 
-                if download_and_save_image(img_url, filename):
-                    print(f"Guardado: {filename}")
-                    pokemon_data = {
-                        "Name": name,
-                        "Pokedex Number": pokedex_number,
-                        "Types": types,
-                        "Image": filename
-                    }
+            if download_and_save_image(img_url, filename):
+                print(f"Guardado: {filename}")
+                pokemon_data = {
+                    "Name": name,
+                    "Pokedex Number": pokedex_number,
+                    "Types": types,
+                    "Image": filename
+                }
+                if existing_pokemon:
+                    print(f"Salteando: {name} ya existe en la base de datos.")
+                else:
                     result = pokemon_collection.insert_one(pokemon_data)
                     print("Pokemon insertado correctamente con ID:", result.inserted_id)
                     print(f"Se inserto: {name}, Numero: {pokedex_number}, Tipo(s): {', '.join(types)}")
-                else:
-                    print(f"Fallo al descargar la imagen de: {name}")
+            else:
+                print(f"Fallo al descargar la imagen de: {name}")
 
         except Exception as e:
             print(f"Error procesando: {e}")
