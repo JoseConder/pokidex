@@ -41,17 +41,24 @@ class PokemonViewer:
         self.button_next.pack(side=tk.RIGHT)
 
         # Botones para seleccionar la lista a usar
-        self.button_sort_by_name = tk.Button(self.window, text="Sort by Name", command=self.sort_by_name)
+        self.button_sort_by_name = tk.Button(self.window, text="Ordenar por Nombre", command=self.sort_by_name)
         self.button_sort_by_name.pack(side=tk.LEFT)
 
-        self.button_sort_by_number = tk.Button(self.window, text="Sort by Number", command=self.sort_by_number)
+        self.button_sort_by_number = tk.Button(self.window, text="Ordenar por Número", command=self.sort_by_number)
         self.button_sort_by_number.pack(side=tk.RIGHT)
 
         self.entry_search = tk.Entry(self.window)
         self.entry_search.pack()
 
-        self.button_search = tk.Button(self.window, text="Buscar", command=self.search_pokemon)
+        self.button_search = tk.Button(self.window, text="Buscar por Nombre", command=self.search_pokemon)
         self.button_search.pack()
+        # Entry para buscar por número
+        self.entry_search_number = tk.Entry(self.window)
+        self.entry_search_number.pack()
+
+        # Botón para buscar por número
+        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon_by_number)
+        self.button_search_number.pack()
 
         self.show_pokemon()
 
@@ -91,6 +98,11 @@ class PokemonViewer:
         self.index = 0
         self.show_pokemon()
 
+    def sort_by_name2(self):
+        self.pokemons = get_pokemon_names()
+        self.index=0
+        return self.pokemons
+    
     def search_pokemon(self):
         pokemons = self.sort_by_name2()
         pokemons = [(name.lower(), number) for name, number in pokemons]
@@ -112,5 +124,4 @@ if comm.Get_rank() == 0:
     viewer = PokemonViewer(pokemons)
     viewer.run()
 else:
-    # Código para los procesos MPI adicionales, si es necesario
     pass
