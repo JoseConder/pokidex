@@ -15,4 +15,3 @@ def dropCollection(name):
         print(f"La colección '{name}' ha sido eliminada.")
     else:
         print(f"La colección '{name}' no existe.")
-

@@ -1,7 +1,9 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+from mpi4py import MPI
 from dbcon import connection
 from show import get_pokemon_names, get_pokemon_name_by_numbers
+from binary_search import binary_search
 
 def get_pokemon_data():
     client, db = connection()
@@ -46,13 +48,19 @@ class PokemonViewer:
         self.button_sort_by_number = tk.Button(self.window, text="Sort by Number", command=self.sort_by_number)
         self.button_sort_by_number.pack(side=tk.RIGHT)
 
+        self.entry_search = tk.Entry(self.window)
+        self.entry_search.pack()
+
+        self.button_search = tk.Button(self.window, text="Buscar", command=self.search_pokemon)
+        self.button_search.pack()
+
         self.show_pokemon()
 
     def show_pokemon(self):
         name, number = self.pokemons[self.index]
 
         self.label_name.config(text=f"Nombre: {name}")
-        self.label_number.config(text=f"Número: #{number}")
+        self.label_number.config(text=f"Número: {number}")
 
         image_path = f"resources/pokemon/{name}.png"
         image = Image.open(image_path)
@@ -79,9 +87,34 @@ class PokemonViewer:
         self.index = 0
         self.show_pokemon()
 
+    def search_pokemon(self):
+        search_term = self.entry_search.get().lower()
+        result = binary_search(self.pokemons, search_term)
+        if result:
+            self.index = self.pokemons.index(result)
+            self.show_pokemon()
+        else:
+            print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
+
+    """"
+    def search_pokemon(self):
+        search_term = self.entry_search.get().lower()
+        result = binary_search(self.pokemons, search_term)
+        if result:
+            self.index = self.pokemons.index(result)
+            self.show_pokemon()
+        else:
+            print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
+   """
     def run(self):
         self.window.mainloop()
 
-pokemons = get_pokemon_data()
-viewer = PokemonViewer(pokemons)
-viewer.run()
+comm = MPI.COMM_WORLD
+
+if comm.Get_rank() == 0:
+    pokemons = get_pokemon_data()
+    viewer = PokemonViewer(pokemons)
+    viewer.run()
+else:
+    # Código para los procesos MPI adicionales, si es necesario
+    pass

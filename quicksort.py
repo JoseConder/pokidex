@@ -32,4 +32,3 @@ def parallel_quicksort(arr, comm):
     
     if rank == 0:
         return quicksort([elem for sublist in sorted_arr for elem in sublist])
-
