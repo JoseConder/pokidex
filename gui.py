@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 from mpi4py import MPI
 from dbcon import connection
 from show import get_pokemon_names, get_pokemon_name_by_numbers, binary_search, binary_search_by_number
-
+from tkinter import messagebox
 def get_pokemon_data():
     client, db = connection()
     pokemon_collection = db['Pokemon']
@@ -116,6 +116,8 @@ class PokemonViewer:
             self.show_pokemon()
         else:
             print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
+            messagebox.showinfo("Pokémon no encontrado", f"No se encontró ningún Pokémon con el nombre '{search_term}'")
+
     
     def search_pokemon_by_number(self):
         # Ordenamos la lista de Pokémon por número si aún no está ordenada
@@ -129,9 +131,9 @@ class PokemonViewer:
                 self.index = self.pokemons.index(result)
                 self.show_pokemon()
             else:
-                print(f"No se encontró ningún Pokémon con el número '{number_str}'")
+                messagebox.showinfo("Pokémon no encontrado", f"No se encontró ningún Pokémon con el número '{number_str}'")
         except ValueError:
-            print("Por favor, introduce un número válido.")
+            messagebox.showinfo("Error", "Por favor, introduce un número válido.")
 
     def run(self):
         self.window.mainloop()

@@ -92,6 +92,25 @@ def show_pokemon(pokemons):
                 print(f"Nombre: {name.encode('ascii', 'ignore').decode()}, Numero: {number}, Contador: {count}")
             print(f"Total de Pokemon: {count}")
 
+
+def search_pokemon_by_number(pokemon_numbers):
+    if comm.Get_rank() == 0:
+        number_str = input("Ingresa el número del Pokémon que deseas buscar : ")
+        number_str = "#" + number_str
+    else:
+        number_str = None
+
+    number_str = comm.bcast(number_str, root=0)
+
+    result = binary_search_by_number(pokemon_numbers, number_str, 0, len(pokemon_numbers))
+    if result:
+        name, number = result
+        print(f"Pokémon encontrado: {name}, Número: {number}")
+    else:
+        print(f"No se encontró ningún Pokémon con el número '{number_str}'")
+
+
+
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -101,7 +120,8 @@ if __name__ == "__main__":
         print("1. Ordenar alfabeticamente")
         print("2. Ordenar por numero de Pokedex")
         print("3. Buscar un Pokemon por nombre")
-        choice = input("Ingrese su eleccion (1, 2 o 3): ")
+        print("4. Buscar un Pokémon por número")
+        choice = input("Ingrese su elección (1, 2, 3 o 4): ")
     else:
         choice = None
 
@@ -126,6 +146,9 @@ if __name__ == "__main__":
             print("Pokemon encontrado:", pokemons[index][0])
         else:
             print("Pokemon no encontrado.")
+    elif choice == "4":
+        pokemons = get_pokemon_name_by_numbers()
+        search_pokemon_by_number(pokemons)
     elif choice is None:
         print("Opción inválida")
         exit()
