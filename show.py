@@ -95,7 +95,7 @@ def show_pokemon(pokemons):
 
 def search_pokemon_by_number(pokemon_numbers):
     if comm.Get_rank() == 0:
-        number_str = input("Ingresa el número del Pokémon que deseas buscar : ")
+        number_str = input("Ingresa el numero del Pokemon que deseas buscar : ")
         number_str = "#" + number_str
     else:
         number_str = None
@@ -105,9 +105,9 @@ def search_pokemon_by_number(pokemon_numbers):
     result = binary_search_by_number(pokemon_numbers, number_str, 0, len(pokemon_numbers))
     if result:
         name, number = result
-        print(f"Pokémon encontrado: {name}, Número: {number}")
+        print(f"Pokemon encontrado: {name}, Numero: {number}")
     else:
-        print(f"No se encontró ningún Pokémon con el número '{number_str}'")
+        print(f"No se encontro ningun Pokemon con el numero '{number_str}'")
 
 
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         print("1. Ordenar alfabeticamente")
         print("2. Ordenar por numero de Pokedex")
         print("3. Buscar un Pokemon por nombre")
-        print("4. Buscar un Pokémon por número")
+        print("4. Buscar un Pokemon por numero")
         choice = input("Ingrese su elección (1, 2, 3 o 4): ")
     else:
         choice = None
@@ -150,5 +150,5 @@ if __name__ == "__main__":
         pokemons = get_pokemon_name_by_numbers()
         search_pokemon_by_number(pokemons)
     elif choice is None:
-        print("Opción inválida")
+        print("Opcion invalida")
         exit()
