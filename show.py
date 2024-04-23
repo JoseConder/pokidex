@@ -66,6 +66,21 @@ def binary_search(data, key, start_index, end_index):
             high = mid - 1
     return -1  
 
+# show.py
+
+def binary_search_by_number(data, key, start_index, end_index):
+    low = start_index
+    high = end_index - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if data[mid][1] == key:
+            return data[mid]  
+        elif data[mid][1] < key:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return None  # 
+
 def show_pokemon(pokemons):
     count = 0
     for pokemon in pokemons:

@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from mpi4py import MPI
 from dbcon import connection
-from show import get_pokemon_names, get_pokemon_name_by_numbers, binary_search
+from show import get_pokemon_names, get_pokemon_name_by_numbers, binary_search, binary_search_by_number
 
 def get_pokemon_data():
     client, db = connection()
@@ -57,7 +57,7 @@ class PokemonViewer:
         self.entry_search_number.pack()
 
         # Botón para buscar por número
-        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon)
+        self.button_search_number = tk.Button(self.window, text="Buscar por Número", command=self.search_pokemon_by_number)
         self.button_search_number.pack()
 
         self.show_pokemon()
@@ -97,7 +97,10 @@ class PokemonViewer:
         self.pokemons = get_pokemon_name_by_numbers()
         self.index = 0
         self.show_pokemon()
-
+    def sort_by_number2(self):
+        self.pokemons = get_pokemon_name_by_numbers()
+        self.index = 0
+        return self.pokemons
     def sort_by_name2(self):
         self.pokemons = get_pokemon_names()
         self.index=0
@@ -115,11 +118,13 @@ class PokemonViewer:
             print(f"No se encontró ningún Pokémon con el nombre '{search_term}'")
     
     def search_pokemon_by_number(self):
-        pokemons=self.sort_by_number2()
+        # Ordenamos la lista de Pokémon por número si aún no está ordenada
+        if not all(self.pokemons[i][1] <= self.pokemons[i+1][1] for i in range(len(self.pokemons)-1)):
+            self.pokemons = self.sort_by_number2()
+
         try:
-            number_str = self.entry_search_number.get().zfill(4)  # Asegura que el número tenga 4 dígitos
-            number = int(number_str)
-            result = self.binary_search_by_number(number)
+            number_str = "#" + self.entry_search_number.get().zfill(4)  # Asegura que el número tenga 4 dígitos y el prefijo "#"
+            result = binary_search_by_number(self.pokemons, number_str, 0, len(self.pokemons))
             if result:
                 self.index = self.pokemons.index(result)
                 self.show_pokemon()
